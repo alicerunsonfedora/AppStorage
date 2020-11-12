@@ -126,6 +126,28 @@ extension AppStorageCompat where Value == Double {
     }
 }
 
+extension AppStorageCompat where Value == Float {
+
+    /// Creates a property that can read and write to a float user default.
+    ///
+    /// - Parameters:
+    ///   - wrappedValue: The default value if a double value is not specified
+    ///     for the given key.
+    ///   - key: The key to read and write the value to in the user defaults
+    ///     store.
+    ///   - store: The user defaults store to read and write to. A value
+    ///     of `nil` will use the user default store from the environment.
+    public init(wrappedValue: Value, _ key: String, store: UserDefaults? = nil) {
+        let store = (store ?? .standard)
+        let initialValue = store.value(forKey: key) as? Value ?? wrappedValue
+        self.init(value: initialValue, store: store, key: key, transform: {
+            $0 as? Value
+        }, saveValue: { newValue in
+            store.setValue(newValue, forKey: key)
+        })
+    }
+}
+
 extension AppStorageCompat where Value == String {
 
     /// Creates a property that can read and write to a string user default.
